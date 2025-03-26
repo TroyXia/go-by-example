@@ -39,6 +39,29 @@ func main() {
 	timer.Reset(3 * time.Second)
 	fmt.Println("重置定时器，等待 3 秒...")
 	ticker := timer.C()
-	<-ticker
-	fmt.Println("定时器再次触发，3 秒已过。")
+
+	jacker := make(chan string)
+
+	go func() {
+		for {
+			jacker <- "ma"
+			time.Sleep(1 * time.Second)
+		}
+	}()
+
+	stopCh := make(chan int)
+	go func() {
+		for {
+			select {
+			case <-ticker:
+				fmt.Println("定时器再次触发，3 秒已过。")
+				stopCh <- 1
+			case <-jacker:
+				fmt.Println("I am jacker")
+			}
+		}
+	}()
+
+	<-stopCh
+	fmt.Println("stopped")
 }
