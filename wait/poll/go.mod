@@ -1,4 +1,4 @@
-module wait
+module poll
 
 go 1.23.6
 
